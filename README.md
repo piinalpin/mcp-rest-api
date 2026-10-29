@@ -313,8 +313,8 @@ bun run smoke       # after bun run build: start dist/index.js with Node.js and 
 ```
 
 GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs the typecheck, tests, build and smoke test on
-every push to `main` and every pull request. It then packs the npm package and runs it with `npx` on Linux, macOS
-and Windows with Node.js 20 and 24.
+every push to `main` and every pull request. It then packs the npm package and runs it with `npx` on Linux
+and Windows with Node.js 24.
 
 The TLS tests generate a self-signed certificate with `openssl` and are skipped when it is not installed.
 
