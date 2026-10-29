@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "internal-api": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@piinalpin/mcp-rest-api"
+      ],
+      "env": {
+        "BASE_URL": "https://internal.example.com/api",
+        "AUTH_BASIC_USERNAME": "service-user",
+        "AUTH_BASIC_PASSWORD": "service-password",
+        "PROXY_URL": "http://proxy-user:proxy-pass@proxy.corp.example.com:3128",
+        "TIMEOUT_MS": "60000"
+      }
+    }
+  }
+}

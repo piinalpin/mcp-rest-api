@@ -1,0 +1,22 @@
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "auth-bearer",
+      "description": "API bearer token",
+      "password": true
+    }
+  ],
+  "servers": {
+    "rest-api": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@piinalpin/mcp-rest-api"],
+      "env": {
+        "BASE_URL": "https://api.example.com/v1",
+        "AUTH_BEARER": "${input:auth-bearer}",
+        "HEADER_Accept": "application/json"
+      }
+    }
+  }
+}

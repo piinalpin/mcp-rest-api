@@ -1,0 +1,51 @@
+{
+  "name": "@piinalpin/mcp-rest-api",
+  "version": "0.1.0",
+  "description": "MCP server (stdio) for testing REST APIs: all HTTP methods, custom headers, auth, credential masking, response size limits, SSL toggle, SOCKS/HTTP proxy",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "rest",
+    "api",
+    "http",
+    "socks5",
+    "proxy"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "module": "src/index.ts",
+  "bin": {
+    "mcp-rest-api": "dist/index.js"
+  },
+  "files": [
+    "dist/index.js",
+    "README.md",
+    "CLIENTS.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "dev": "bun --watch run src/index.ts",
+    "build": "bun build src/index.ts --target=node --outfile dist/index.js --banner '#!/usr/bin/env node' && chmod +x dist/index.js",
+    "compile": "bun build src/index.ts --compile --outfile dist/mcp-rest-api",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "bun run typecheck && bun test && bun run build"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "@types/bun": "^1.4.4",
+    "http-proxy-agent": "^9.1.0",
+    "https-proxy-agent": "^9.1.0",
+    "socks-proxy-agent": "^10.1.0",
+    "typescript": "^7.0.2",
+    "zod": "^4.6.7"
+  },
+  "author": "piinalpin"
+}

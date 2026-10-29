@@ -1,0 +1,9 @@
+[mcp_servers.rest-api]
+command = "npx"
+args = ["-y", "@piinalpin/mcp-rest-api"]
+# Forwarded from your shell environment instead of stored in this file.
+env_vars = ["AUTH_BEARER"]
+
+[mcp_servers.rest-api.env]
+BASE_URL = "https://api.example.com/v1"
+HEADER_Accept = "application/json"

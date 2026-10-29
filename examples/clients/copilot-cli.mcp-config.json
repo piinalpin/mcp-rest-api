@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "rest-api": {
+      "type": "local",
+      "command": "npx",
+      "args": ["-y", "@piinalpin/mcp-rest-api"],
+      "env": {
+        "BASE_URL": "https://api.example.com/v1",
+        "AUTH_BEARER": "your-token",
+        "HEADER_Accept": "application/json"
+      },
+      "tools": ["*"]
+    }
+  }
+}
