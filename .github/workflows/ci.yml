@@ -118,4 +118,5 @@ jobs:
           npm --version
           # Versions with a prerelease part (1.2.0-beta.1) go to the "next" dist-tag, not "latest".
           if [[ "$GITHUB_REF_NAME" == *-* ]]; then tag=next; else tag=latest; fi
-          npm publish package/*.tgz --tag "$tag"
+          # "./" is required: npm reads "package/x.tgz" as a GitHub "user/repo" shorthand.
+          npm publish ./package/*.tgz --tag "$tag"
