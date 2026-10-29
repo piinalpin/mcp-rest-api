@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Typecheck, test and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Test
+        run: bun test
+
+      - name: Build
+        run: bun run build
+
+      - name: Smoke test bundle
+        run: bun run smoke
+
+      - name: Pack
+        run: npm pack
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: npm-package
+          path: "*.tgz"
+          if-no-files-found: error
+          retention-days: 7
+
+  npx:
+    name: npx (Node ${{ matrix.node }}, ${{ matrix.os }})
+    needs: test
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: [20, 24]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: npm-package
+          path: package
+
+      - name: Run packed package with npx
+        shell: bash
+        run: |
+          tgz="$(ls "$PWD"/package/*.tgz)"
+          if [ "$RUNNER_OS" = "Windows" ]; then tgz="$(cygpath -w "$tgz")"; fi
+          # Run outside the checkout so npx installs the tarball instead of using this project.
+          cd "$RUNNER_TEMP"
+          node "$GITHUB_WORKSPACE/scripts/smoke.mjs" npx -y "--package=$tgz" mcp-rest-api

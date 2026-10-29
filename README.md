@@ -309,7 +309,12 @@ More examples: [examples/requests.md](examples/requests.md).
 bun test            # unit and integration tests (local echo, SOCKS5, HTTP proxy and TLS servers)
 bun run typecheck   # tsc --noEmit
 bun run dev         # run with --watch
+bun run smoke       # after bun run build: start dist/index.js with Node.js and call the tool over stdio
 ```
+
+GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs the typecheck, tests, build and smoke test on
+every push to `main` and every pull request. It then packs the npm package and runs it with `npx` on Linux, macOS
+and Windows with Node.js 20 and 24.
 
 The TLS tests generate a self-signed certificate with `openssl` and are skipped when it is not installed.
 

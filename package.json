@@ -36,7 +36,8 @@
     "compile": "bun build src/index.ts --compile --outfile dist/mcp-rest-api",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "bun run typecheck && bun test && bun run build"
+    "prepublishOnly": "bun run typecheck && bun test && bun run build",
+    "smoke": "node scripts/smoke.mjs node dist/index.js"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.32.2",
