@@ -1,6 +1,6 @@
 {
   "name": "@piinalpin/mcp-rest-api",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "MCP server (stdio) for testing REST APIs: all HTTP methods, custom headers, auth, credential masking, response size limits, SSL toggle, SOCKS/HTTP proxy",
   "keywords": [
     "mcp",
