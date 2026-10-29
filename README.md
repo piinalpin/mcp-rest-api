@@ -314,7 +314,7 @@ bun run smoke       # after bun run build: start dist/index.js with Node.js and 
 
 GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs the typecheck, tests, build and smoke test on
 every push to `main` and every pull request. It then packs the npm package and runs it with `npx` on Linux
-and Windows with Node.js 24.
+and Windows with Node.js 24. On a `v*` tag it also publishes to npm (see [Publish](#publish)).
 
 The TLS tests generate a self-signed certificate with `openssl` and are skipped when it is not installed.
 
@@ -344,7 +344,39 @@ BASE_URL=https://jsonplaceholder.typicode.com npx -y --package=/absolute/path/to
 
 ### Publish
 
+CI publishes to npm when you push a version tag. Pushes to `main` and pull requests only run the checks.
+
 ```bash
+npm version patch        # or minor / major: updates package.json and creates the tag v1.2.3
+git push --follow-tags
+```
+
+For the tag, the workflow:
+
+1. Fails early if the tag (without `v`) differs from the `version` in `package.json`.
+2. Runs the typecheck, tests, build and smoke test, then the `npx` checks on Linux and Windows.
+3. Publishes the exact tarball that passed those checks. Versions with a prerelease part, such as
+   `1.2.0-beta.1`, get the `next` dist-tag; others get `latest`.
+
+Publishing uses [npm trusted publishing](https://docs.npmjs.com/trusted-publishers) (OIDC), so no npm token is
+stored in GitHub, and npm adds provenance to each version. One-time setup on npmjs.com, under the package's
+**Settings > Trusted publishing**, add a GitHub Actions publisher:
+
+| Field | Value |
+|---|---|
+| Organization or user | `piinalpin` |
+| Repository | `mcp-rest-api` |
+| Workflow filename | `ci.yml` |
+| Environment | (leave empty) |
+| Allowed actions | enable `npm publish` |
+
+New trusted publisher configurations allow only `npm stage publish` by default, so `npm publish` must be enabled.
+A new configuration expires if it has no successful publish within 2 days, so push the tag soon after creating it.
+
+If npmjs.com does not let you add a trusted publisher before the package exists, publish the first version by hand:
+
+```bash
+bun run build
 npm login
 npm publish
 ```

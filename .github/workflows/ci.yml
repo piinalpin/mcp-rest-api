@@ -3,6 +3,8 @@ name: CI
 on:
   push:
     branches: [main]
+    # Pushing a version tag (v1.2.3) runs the same checks, then publishes to npm.
+    tags: ["v*"]
   pull_request:
   workflow_dispatch:
 
@@ -24,6 +26,15 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.4
+
+      - name: Check tag matches package.json version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if [ "${GITHUB_REF_NAME#v}" != "$version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $version"
+            exit 1
+          fi
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -80,3 +91,31 @@ jobs:
           # Run outside the checkout so npx installs the tarball instead of using this project.
           cd "$RUNNER_TEMP"
           node "$GITHUB_WORKSPACE/scripts/smoke.mjs" npx -y "--package=$tgz" mcp-rest-api
+
+  publish:
+    name: Publish to npm
+    needs: [test, npx]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write # npm trusted publishing (OIDC) and provenance
+    steps:
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: npm-package
+          path: package
+
+      - name: Publish the tested tarball
+        shell: bash
+        run: |
+          npm --version
+          # Versions with a prerelease part (1.2.0-beta.1) go to the "next" dist-tag, not "latest".
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then tag=next; else tag=latest; fi
+          npm publish package/*.tgz --tag "$tag"
